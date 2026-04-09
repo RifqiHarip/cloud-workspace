@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { LocalGuard } from './guards/local.guard';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import * as express from 'express';
+import { RegisterPayloadDto } from './dto/register.dto';
 @Controller('auth')
 export class AuthController {
 
@@ -21,6 +22,17 @@ export class AuthController {
         return req.user;
     }
 
+    @Post('register')
+    async register(@Body() registerPayload: RegisterPayloadDto) {
+      const newUser = await this.authService.registerUser(registerPayload);
+    
+      // Return only the specific fields
+      return {
+        username: newUser.username,
+        email: newUser.email,
+        name: newUser.name, // Will be returned if it exists, otherwise undefined/null
+      };
+    }
     @Get('status')
     @UseGuards(JwtAuthGuard)
     status(@Req() req: express.Request) {
